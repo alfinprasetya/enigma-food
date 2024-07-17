@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody UserDTO request) {
+    public ResponseEntity<?> create(@RequestBody UserDTO request) {
         return Res.renderJson(
                 userService.create(request),
                 HttpStatus.CREATED,
@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Integer id, @Valid @RequestBody UserDTO request) {
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody UserDTO request) {
         return Res.renderJson(
                 userService.update(id, request),
                 HttpStatus.OK,
