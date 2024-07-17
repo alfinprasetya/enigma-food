@@ -4,6 +4,8 @@ import com.enigma.food.model.User;
 import com.enigma.food.service.UserService;
 import com.enigma.food.utils.Res;
 
+import com.enigma.food.utils.dto.UserDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping
+    public ResponseEntity<?> create(@Valid @RequestBody UserDTO request) {
+        return Res.renderJson(
+                userService.create(request),
+                HttpStatus.CREATED,
+                "created"
+        );
+    }
 
     @GetMapping
     public ResponseEntity<?> getAll() {
@@ -41,7 +52,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody User request) {
+    public ResponseEntity<?> update(@PathVariable Integer id, @Valid @RequestBody UserDTO request) {
         return Res.renderJson(
                 userService.update(id, request),
                 HttpStatus.OK,

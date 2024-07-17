@@ -1,0 +1,27 @@
+services:
+  mysql:
+    container_name: sqlserver
+    image: mysql
+    ports:
+      - 3307:3306
+    networks:
+      - food_network
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+  food_app:
+    depends_on:
+      - mysql
+    container_name: food-api
+    image: food:1.0
+    ports:
+      - 8080:8080
+    networks:
+      - food_network
+    environment:
+      - HOST=sqlserver
+      - jwt_secret=veryLongAndSecureKey123456789lalala
+networks:
+  food_network:
+    name: food_network
