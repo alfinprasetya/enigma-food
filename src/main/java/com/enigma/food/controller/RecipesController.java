@@ -2,7 +2,10 @@ package com.enigma.food.controller;
 
 import com.enigma.food.model.Recipes;
 import com.enigma.food.service.RecipesService;
+import com.enigma.food.utils.Res;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,18 +22,21 @@ public class RecipesController {
     }
 
     @GetMapping("/{id}")
-    public Recipes getOne(@PathVariable Integer id){
-        return service.getOne(id);
+    public ResponseEntity<?> getOne(@PathVariable Integer id){
+        Recipes recipes = service.getOne(id);
+        return Res.renderJson(recipes, HttpStatus.OK, "Success");
     }
 
     @PostMapping
-    public Recipes create(@RequestBody Recipes req){
-        return service.create(req);
+    public ResponseEntity<?> create(@RequestBody Recipes req){
+        Recipes recipes = service.create(req);
+        return Res.renderJson(recipes, HttpStatus.OK, "Recipes Create Successfully");
     }
 
     @PutMapping("/{id}")
-    public Recipes update(@PathVariable Integer id, @RequestBody Recipes req){
-        return service.update(id, req);
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody Recipes req){
+        Recipes recipes = service.update(id, req);
+        return Res.renderJson(recipes, HttpStatus.OK, "Recipes Update Sucessfully");
     }
 
     @DeleteMapping("/{id}")
