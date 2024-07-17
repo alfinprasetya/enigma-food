@@ -1,8 +1,10 @@
 package com.enigma.food.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.enigma.food.model.Coordinate;
 import com.enigma.food.service.MapService;
@@ -20,25 +22,34 @@ public class MapServiceImpl implements MapService {
   private String accessToken;
 
   @Override
-  public Coordinate getCityCoordinate(String city) throws JsonProcessingException {
+  public Coordinate getCityCoordinate(String city) {
     String url = String.format(
         "https://api.mapbox.com/geocoding/v5/mapbox.places/%s.json?limit=1&access_token=%s",
         city, accessToken);
 
     String response = restTemplate.getForObject(url, String.class);
 
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode root = mapper.readTree(response);
-    JsonNode coordinates = root.path("features").get(0).path("geometry").path("coordinates");
+    Coordinate realCoordinate = new Coordinate();
 
-    double longitude = coordinates.get(0).asDouble();
-    double latitude = coordinates.get(1).asDouble();
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode root = mapper.readTree(response);
+      JsonNode coordinates = root.path("features").get(0).path("geometry").path("coordinates");
+      
+      double longitude = coordinates.get(0).asDouble();
+      double latitude = coordinates.get(1).asDouble();
 
-    return Coordinate.builder().latitude(latitude).longitude(longitude).build();
+      realCoordinate.setLatitude(latitude);
+      realCoordinate.setLongitude(longitude);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Coordinate not found");
+    }
+
+    return realCoordinate;
   }
 
   @Override
-  public Integer getDistance(GetDistanceRequest request) throws JsonProcessingException {
+  public Integer getDistance(GetDistanceRequest request) {
     String url = String.format(
         "https://api.mapbox.com/directions/v5/mapbox/driving/%f,%f;%f,%f?access_token=%s",
         request.getOrigin().getLongitude(),
@@ -48,15 +59,22 @@ public class MapServiceImpl implements MapService {
         accessToken);
     String response = restTemplate.getForObject(url, String.class);
 
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode root = mapper.readTree(response);
-    JsonNode distance = root.path("routes").get(0).path("distance");
+    Integer realDistance = 0;
 
-    return distance.asInt(0) / 1000;
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode root = mapper.readTree(response);
+      JsonNode distance = root.path("routes").get(0).path("distance");
+      realDistance = distance.asInt(0);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Distance can't be calculated");
+    }
+
+    return realDistance / 1000;
   }
 
   @Override
-  public Integer getPriceByDistance(GetDistanceRequest request) throws JsonProcessingException {
+  public Integer getPriceByDistance(GetDistanceRequest request) {
     Integer distance = this.getDistance(request);
 
     return distance * 1000;
