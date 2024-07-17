@@ -3,6 +3,7 @@ package com.enigma.food.controller;
 import com.enigma.food.model.Recipes;
 import com.enigma.food.service.RecipesService;
 import com.enigma.food.utils.Res;
+import com.enigma.food.utils.dto.RecipeCreatesDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class RecipesController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Recipes req){
+    public ResponseEntity<?> create(@RequestBody RecipeCreatesDTO req){
         Recipes recipes = service.create(req);
         return Res.renderJson(recipes, HttpStatus.OK, "Recipes Create Successfully");
     }
