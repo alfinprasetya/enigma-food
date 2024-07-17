@@ -4,7 +4,7 @@ import com.enigma.food.model.Recipes;
 import com.enigma.food.repository.RecipesRepository;
 import com.enigma.food.service.RecipesService;
 import com.enigma.food.service.ValidationService;
-import com.enigma.food.utils.dto.RecipeCreatesDTO;
+import com.enigma.food.utils.dto.RecipeCreatesUpdatesDTO;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class RecipesServiceImpl implements RecipesService {
     }
 
     @Override
-    public Recipes create(RecipeCreatesDTO req) {
+    public Recipes create(RecipeCreatesUpdatesDTO req) {
         validationService.validate(req);
         Recipes recipes = new Recipes();
         recipes.setName(req.getName());
@@ -42,13 +42,14 @@ public class RecipesServiceImpl implements RecipesService {
     }
 
     @Override
-    public Recipes update(Integer id, Recipes req) {
-        Recipes recipe = this.getOne(id);
-        recipe.setName(req.getName());
-        recipe.setDescription(req.getDescription());
-        recipe.setMethod(req.getMethod());
-        recipe.setPrice(req.getPrice());
-        return recipe;
+    public Recipes update(Integer id, RecipeCreatesUpdatesDTO req) {
+        validationService.validate(req);
+        Recipes recipes = this.getOne(id);
+        recipes.setName(req.getName());
+        recipes.setDescription(req.getDescription());
+        recipes.setMethod(req.getMethod());
+        recipes.setPrice(Integer.valueOf(req.getPrice()));
+        return repository.save(recipes);
     }
 
     @Override

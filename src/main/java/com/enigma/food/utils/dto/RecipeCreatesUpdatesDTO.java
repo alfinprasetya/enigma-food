@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RecipeCreatesDTO {
+public class RecipeCreatesUpdatesDTO {
     @NotBlank
     @Size(max = 110, min =2)
     private String name;
