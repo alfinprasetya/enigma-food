@@ -2,7 +2,8 @@ package com.enigma.food.controller;
 
 import com.enigma.food.model.Items;
 import com.enigma.food.service.ItemsService;
-import com.enigma.food.utils.dto.Res;
+import com.enigma.food.utils.Res;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

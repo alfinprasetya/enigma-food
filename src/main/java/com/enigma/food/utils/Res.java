@@ -1,4 +1,4 @@
-package com.enigma.food.utils.dto;
+package com.enigma.food.utils;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
