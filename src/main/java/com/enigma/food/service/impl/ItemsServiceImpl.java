@@ -1,10 +1,13 @@
-package com.enigma.food.service.Impl;
+package com.enigma.food.service.impl;
 
-import com.enigma.food.Model.Items;
-import com.enigma.food.Repository.ItemsRepo;
+import com.enigma.food.model.Items;
+import com.enigma.food.repository.ItemsRepo;
 import com.enigma.food.service.ItemsService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,7 +23,7 @@ public class ItemsServiceImpl implements ItemsService {
 
     @Override
     public Items getOne(Integer id) {
-        return itemsRepo.findById(id).orElseThrow(()-> new RuntimeException("Items With " + id + " Not Found"));
+        return itemsRepo.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Items With " + id + " Not Found"));
     }
 
     @Override

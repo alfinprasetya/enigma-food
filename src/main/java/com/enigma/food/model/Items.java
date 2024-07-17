@@ -1,4 +1,4 @@
-package com.enigma.food.Model;
+package com.enigma.food.model;
 
 import jakarta.persistence.*;
 import lombok.*;

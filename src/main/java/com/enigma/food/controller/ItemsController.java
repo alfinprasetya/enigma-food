@@ -1,15 +1,12 @@
 package com.enigma.food.controller;
 
-import com.enigma.food.Model.Items;
+import com.enigma.food.model.Items;
 import com.enigma.food.service.ItemsService;
 import com.enigma.food.utils.dto.Res;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/items")

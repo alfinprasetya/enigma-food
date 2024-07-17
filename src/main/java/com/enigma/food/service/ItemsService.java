@@ -1,8 +1,8 @@
 package com.enigma.food.service;
 
-import com.enigma.food.Model.Items;
-
 import java.util.List;
+
+import com.enigma.food.model.Items;
 
 public interface ItemsService {
     List<Items> getAll();

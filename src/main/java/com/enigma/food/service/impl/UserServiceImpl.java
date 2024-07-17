@@ -5,7 +5,10 @@ import com.enigma.food.model.User;
 import com.enigma.food.repository.UserRepository;
 import com.enigma.food.service.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -17,8 +20,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User request) {
-        if (userRepository.findByUsername(request.getUsername()) != null) {
-            throw new RuntimeException("Username is already taken");
+        if (!userRepository.findByUsername(request.getUsername()).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
         User user = new User();
         user.setUsername(request.getUsername());
@@ -36,14 +39,13 @@ public class UserServiceImpl implements UserService {
     public User getOne(Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(
-                        () -> new RuntimeException("User Not Found")
-                );
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Not Found"));
     }
 
     @Override
     public User update(Integer id, User request) {
-        if (userRepository.findByUsername(request.getUsername()) != null) {
-            throw new RuntimeException("Username is already taken");
+        if (!userRepository.findByUsername(request.getUsername()).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
         User user = this.getOne(id);
         user.setUsername(request.getUsername());

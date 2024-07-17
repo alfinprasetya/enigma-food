@@ -18,7 +18,7 @@ public class RecipesController {
         return service.getAll();
     }
 
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public Recipes getOne(@PathVariable Integer id){
         return service.getOne(id);
     }
@@ -28,12 +28,12 @@ public class RecipesController {
         return service.create(req);
     }
 
-    @PutMapping("/id")
+    @PutMapping("/{id}")
     public Recipes update(@PathVariable Integer id, @RequestBody Recipes req){
         return service.update(id, req);
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable Integer id){
         service.delete(id);
     }

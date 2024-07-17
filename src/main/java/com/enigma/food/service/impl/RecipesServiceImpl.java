@@ -1,17 +1,21 @@
 package com.enigma.food.service.impl;
 
 import com.enigma.food.model.Recipes;
-import com.enigma.food.repo.RecipesRepository;
+import com.enigma.food.repository.RecipesRepository;
 import com.enigma.food.service.RecipesService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RecipesServiceImpl implements RecipesService {
     private final RecipesRepository repository;
+
     @Override
     public List<Recipes> getAll() {
         return repository.findAll();
@@ -19,7 +23,8 @@ public class RecipesServiceImpl implements RecipesService {
 
     @Override
     public Recipes getOne(Integer id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Recipe with " + id + " Not found"));
+        return repository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe with " + id + " Not found"));
     }
 
     @Override
