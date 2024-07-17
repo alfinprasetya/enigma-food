@@ -3,6 +3,8 @@ package com.enigma.food.service.impl;
 import com.enigma.food.model.Items;
 import com.enigma.food.repository.ItemsRepo;
 import com.enigma.food.service.ItemsService;
+import com.enigma.food.service.ValidationService;
+import com.enigma.food.utils.dto.ItemsDto;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemsServiceImpl implements ItemsService {
     private final ItemsRepo itemsRepo;
+    private final ValidationService validationService;
 
     @Override
     public List<Items> getAll() {
@@ -27,14 +30,19 @@ public class ItemsServiceImpl implements ItemsService {
     }
 
     @Override
-    public Items create(Items req) {
-        return itemsRepo.save(req);
+    public Items create(ItemsDto req) {
+        validationService.validate(req);
+        Items items = new Items();
+        items.setName(req.getName());
+        items.setQty(req.getQty());
+        return itemsRepo.save(items);
     }
 
     @Override
-    public Items update(Integer id, Items req) {
+    public Items update(Integer id, ItemsDto req) {
+        validationService.validate(req);
         Items items = this.getOne(id);
-        items.setName(req.getName());
+        items.setName(items.getName());
         items.setQty(req.getQty());
         return itemsRepo.save(items);
     }
