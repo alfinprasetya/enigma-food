@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class MapController {
 
   private final MapService mapService;
-  
 
   @GetMapping("/{city}")
   public ResponseEntity<?> getCityCoordinat(@PathVariable String city) throws JsonProcessingException {
@@ -33,7 +32,11 @@ public class MapController {
 
   @PostMapping("/distance")
   public ResponseEntity<?> getDistance(@RequestBody GetDistanceRequest request) throws JsonProcessingException {
-    return Res.renderJson(this.getDistance(request), HttpStatus.OK, "Distance calculated");
+    return Res.renderJson(this.mapService.getDistance(request), HttpStatus.OK, "Distance calculated");
   }
 
+  @PostMapping("/price")
+  public ResponseEntity<?> getPriceByDistance(@RequestBody GetDistanceRequest request) throws JsonProcessingException {
+    return Res.renderJson(this.mapService.getPriceByDistance(request), HttpStatus.OK, "Price calculated");
+  }
 }

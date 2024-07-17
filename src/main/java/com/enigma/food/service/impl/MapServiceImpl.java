@@ -55,4 +55,11 @@ public class MapServiceImpl implements MapService {
     return distance.asInt(0) / 1000;
   }
 
+  @Override
+  public Integer getPriceByDistance(GetDistanceRequest request) throws JsonProcessingException {
+    Integer distance = this.getDistance(request);
+
+    return distance * 1000;
+  }
+
 }

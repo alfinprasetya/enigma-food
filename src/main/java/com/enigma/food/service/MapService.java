@@ -8,4 +8,6 @@ public interface MapService {
   Coordinate getCityCoordinate(String city) throws JsonProcessingException;
 
   Integer getDistance(GetDistanceRequest request) throws JsonProcessingException;
+  
+  Integer getPriceByDistance(GetDistanceRequest request) throws JsonProcessingException;
 }
