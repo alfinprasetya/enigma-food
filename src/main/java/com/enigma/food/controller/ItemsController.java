@@ -4,6 +4,7 @@ import com.enigma.food.model.Items;
 import com.enigma.food.service.ItemsService;
 import com.enigma.food.utils.Res;
 
+import com.enigma.food.utils.dto.ItemsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class ItemsController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Items req){
+    public ResponseEntity<?> create(@RequestBody ItemsDto req){
         return Res.renderJson(
                 itemsService.create(req),
                 HttpStatus.CREATED,
@@ -43,7 +44,7 @@ public class ItemsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody Items req){
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody ItemsDto req){
         return Res.renderJson(
                 itemsService.update(id, req),
                 HttpStatus.OK,
