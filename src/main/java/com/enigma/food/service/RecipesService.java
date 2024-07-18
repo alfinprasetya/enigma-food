@@ -6,6 +6,8 @@ import com.enigma.food.utils.dto.RecipeUpdatesDTO;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface RecipesService {
     List<Recipes> getAll();
 
@@ -15,4 +17,5 @@ public interface RecipesService {
 
     void delete(Integer id);
 
+    Recipes upload(Integer id, MultipartFile file);
 }

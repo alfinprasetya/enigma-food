@@ -3,7 +3,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "nama_table")
+@Table(name = "recipes")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -17,4 +17,5 @@ public class Recipes {
     private String description;
     private String method;
     private Integer price;
+    private String imageUrl;
 }
