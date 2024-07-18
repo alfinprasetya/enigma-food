@@ -4,9 +4,9 @@ import com.enigma.food.model.Role;
 import com.enigma.food.model.User;
 import com.enigma.food.repository.UserRepository;
 import com.enigma.food.security.JwtTokenProvider;
+import com.enigma.food.service.ValidationService;
 import com.enigma.food.utils.Res;
-import com.enigma.food.utils.dto.UserDTO;
-import jakarta.validation.Valid;
+import com.enigma.food.utils.dto.UserCreateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +32,11 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ValidationService validationService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserDTO request) {
+    public ResponseEntity<?> register(@RequestBody UserCreateDTO request) {
+        validationService.validate(request);
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             return Res.renderJson(null, HttpStatus.BAD_REQUEST, "username is taken");
         }
@@ -42,6 +44,7 @@ public class AuthController {
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        newUser.setBalance(request.getBalance());
 
         if (newUser.getRole() == null) {
             newUser.setRole(Role.ROLE_USER);
@@ -55,7 +58,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserDTO request) {
+    public ResponseEntity<?> login(@RequestBody UserCreateDTO request) {
+        validationService.validate(request);
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
