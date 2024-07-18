@@ -4,9 +4,12 @@ import com.enigma.food.model.Role;
 import com.enigma.food.model.User;
 import com.enigma.food.repository.UserRepository;
 import com.enigma.food.service.UserService;
+import com.enigma.food.service.ValidationService;
+import com.enigma.food.utils.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,17 +20,23 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ValidationService validationService;
 
     @Override
-    public User create(User request) {
+    public User create(UserDTO request) {
+        validationService.validate(request);
+
         if (!userRepository.findByUsername(request.getUsername()).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
-        user.setRole(Role.ROLE_ADMIN);
-        return userRepository.save(request);
+        User newAdmin = new User();
+        newAdmin.setUsername(request.getUsername());
+        newAdmin.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (newAdmin.getRole() == null) {
+            newAdmin.setRole(Role.ROLE_ADMIN);
+        }
+        return userRepository.save(newAdmin);
     }
 
     @Override
@@ -43,7 +52,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(Integer id, User request) {
+    public User update(Integer id, UserDTO request) {
+        validationService.validate(request);
         if (!userRepository.findByUsername(request.getUsername()).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
