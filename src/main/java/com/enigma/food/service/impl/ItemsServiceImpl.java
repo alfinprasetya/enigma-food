@@ -4,9 +4,12 @@ import com.enigma.food.model.Items;
 import com.enigma.food.repository.ItemsRepo;
 import com.enigma.food.service.ItemsService;
 import com.enigma.food.service.ValidationService;
-import com.enigma.food.utils.dto.ItemsDto;
+import com.enigma.food.utils.Specification.ItemsSpecification;
+import com.enigma.food.utils.dto.ItemsCreateDto;
+import com.enigma.food.utils.dto.ItemsUpdateDto;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,8 +23,9 @@ public class ItemsServiceImpl implements ItemsService {
     private final ValidationService validationService;
 
     @Override
-    public List<Items> getAll() {
-        return itemsRepo.findAll();
+    public List<Items> getAll(String name, Integer maxQty, Integer minQty) {
+        Specification<Items> spec = ItemsSpecification.getItemsSpecification(name, maxQty, minQty );
+        return itemsRepo.findAll(spec);
     }
 
     @Override
@@ -30,7 +34,7 @@ public class ItemsServiceImpl implements ItemsService {
     }
 
     @Override
-    public Items create(ItemsDto req) {
+    public Items create(ItemsCreateDto req) {
         validationService.validate(req);
         Items items = new Items();
         items.setName(req.getName());
@@ -39,11 +43,16 @@ public class ItemsServiceImpl implements ItemsService {
     }
 
     @Override
-    public Items update(Integer id, ItemsDto req) {
+    public Items update(Integer id, ItemsUpdateDto req){
         validationService.validate(req);
         Items items = this.getOne(id);
-        items.setName(items.getName());
-        items.setQty(req.getQty());
+
+        if (req.getName() != null){
+            items.setName(req.getName());
+        }
+        if (req.getQty() != null){
+            items.setQty(req.getQty());
+        }
         return itemsRepo.save(items);
     }
 
