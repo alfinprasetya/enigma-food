@@ -16,9 +16,9 @@ public class Ingridients {
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "recipe_id")
-    private String recipe;
+    private Recipes recipe;
     @ManyToOne
     @JoinColumn(name = "item_id")
-    private String item;
+    private Items item;
     private Integer qty;
 }
