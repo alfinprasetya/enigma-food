@@ -16,4 +16,5 @@ public class Recipes {
     private String name;
     private String description;
     private String method;
+    private Integer price;
 }

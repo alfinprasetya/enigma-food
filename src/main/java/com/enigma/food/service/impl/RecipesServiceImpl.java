@@ -3,6 +3,8 @@ package com.enigma.food.service.impl;
 import com.enigma.food.model.Recipes;
 import com.enigma.food.repository.RecipesRepository;
 import com.enigma.food.service.RecipesService;
+import com.enigma.food.service.ValidationService;
+import com.enigma.food.utils.dto.RecipeCreatesUpdatesDTO;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecipesServiceImpl implements RecipesService {
     private final RecipesRepository repository;
+    private final ValidationService validationService;
 
     @Override
     public List<Recipes> getAll() {
@@ -28,17 +31,25 @@ public class RecipesServiceImpl implements RecipesService {
     }
 
     @Override
-    public Recipes create(Recipes req) {
-        return repository.save(req);
+    public Recipes create(RecipeCreatesUpdatesDTO req) {
+        validationService.validate(req);
+        Recipes recipes = new Recipes();
+        recipes.setName(req.getName());
+        recipes.setDescription(req.getDescription());
+        recipes.setMethod(req.getMethod());
+        recipes.setPrice(Integer.valueOf(req.getPrice()));
+        return repository.save(recipes);
     }
 
     @Override
-    public Recipes update(Integer id, Recipes req) {
-        Recipes recipe = this.getOne(id);
-        recipe.setName(req.getName());
-        recipe.setDescription(req.getDescription());
-        recipe.setMethod(req.getMethod());
-        return recipe;
+    public Recipes update(Integer id, RecipeCreatesUpdatesDTO req) {
+        validationService.validate(req);
+        Recipes recipes = this.getOne(id);
+        recipes.setName(req.getName());
+        recipes.setDescription(req.getDescription());
+        recipes.setMethod(req.getMethod());
+        recipes.setPrice(Integer.valueOf(req.getPrice()));
+        return repository.save(recipes);
     }
 
     @Override
