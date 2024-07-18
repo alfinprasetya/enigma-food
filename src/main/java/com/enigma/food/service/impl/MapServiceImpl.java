@@ -9,7 +9,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.enigma.food.model.Coordinate;
 import com.enigma.food.service.MapService;
 import com.enigma.food.utils.dto.GetDistanceRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
