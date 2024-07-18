@@ -14,7 +14,11 @@ public class Ingridients {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String name;
-    private String recipe_id;
+    @ManyToOne
+    @JoinColumn(name = "recipe_id")
+    private String recipe;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private String item;
     private Integer qty;
 }
