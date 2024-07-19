@@ -3,6 +3,8 @@ package com.enigma.food.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,4 +31,8 @@ public class Recipes {
         this.ingridients.add(ingridients);
         ingridients.setRecipe(this);
     }
+
+    @OneToMany(mappedBy = "recipes", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 }

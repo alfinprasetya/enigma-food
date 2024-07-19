@@ -12,6 +12,8 @@ import com.enigma.food.utils.dto.RecipeCreatesDTO;
 import com.enigma.food.utils.dto.RecipeUpdatesDTO;
 
 import com.enigma.food.utils.specification.RecipeSpecification;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 
@@ -56,6 +58,7 @@ public class RecipesServiceImpl implements RecipesService {
     }
 
     @Override
+    @Transactional
     public Recipes create(RecipeCreatesDTO req) {
         validationService.validate(req);
 
