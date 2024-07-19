@@ -1,7 +1,11 @@
 package com.enigma.food.service.impl;
 
+import com.enigma.food.model.Ingridients;
+import com.enigma.food.model.Items;
 import com.enigma.food.model.Recipes;
 import com.enigma.food.repository.RecipesRepository;
+import com.enigma.food.service.IngridientService;
+import com.enigma.food.service.ItemsService;
 import com.enigma.food.service.RecipesService;
 import com.enigma.food.service.ValidationService;
 import com.enigma.food.utils.dto.RecipeCreatesDTO;
@@ -20,6 +24,8 @@ import java.util.List;
 public class RecipesServiceImpl implements RecipesService {
     private final RecipesRepository repository;
     private final ValidationService validationService;
+    private final ItemsService itemsService;
+    private final IngridientService ingridientService;
 
     @Override
     public List<Recipes> getAll() {
@@ -35,12 +41,26 @@ public class RecipesServiceImpl implements RecipesService {
     @Override
     public Recipes create(RecipeCreatesDTO req) {
         validationService.validate(req);
-        Recipes recipes = new Recipes();
-        recipes.setName(req.getName());
-        recipes.setDescription(req.getDescription());
-        recipes.setMethod(req.getMethod());
-        recipes.setPrice(req.getPrice());
-        return repository.save(recipes);
+
+        Recipes recipe = new Recipes();
+        recipe.setName(req.getName());
+        recipe.setDescription(req.getDescription());
+        recipe.setMethod(req.getMethod());
+        recipe.setPrice(req.getPrice());
+        Recipes savedRecipe = repository.save(recipe);
+
+        req.getIngredients().forEach(v -> {
+            Items item = itemsService.getOne(v.getItemId());
+
+            Ingridients ingridients = new Ingridients();
+            ingridients.setRecipe(savedRecipe);
+            ingridients.setItem(item);
+            ingridients.setQty(v.getQty());
+            Ingridients savedIngredients = ingridientService.create(ingridients);
+            savedRecipe.addIngredients(savedIngredients);
+        });
+
+        return savedRecipe;
     }
 
     @Override
