@@ -10,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/recipes")
@@ -35,6 +37,13 @@ public class RecipesController {
         Recipes recipes = service.create(req);
         return Res.renderJson(recipes, HttpStatus.OK, "Recipes Create Successfully");
     }
+
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<?> postMethodName(@PathVariable Integer id, @RequestParam("file") MultipartFile file) {
+        Recipes recipes = service.upload(id, file);
+        return Res.renderJson(recipes, HttpStatus.OK, "Recipes Image Uploaded Successfully");
+    }
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody RecipeUpdatesDTO req){

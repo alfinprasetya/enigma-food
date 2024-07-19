@@ -13,10 +13,16 @@ import com.enigma.food.utils.dto.RecipeUpdatesDTO;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
@@ -26,6 +32,9 @@ public class RecipesServiceImpl implements RecipesService {
     private final ValidationService validationService;
     private final ItemsService itemsService;
     private final IngridientService ingridientService;
+
+    @Value("${upload.path}")
+    private String uploadPath;
 
     @Override
     public List<Recipes> getAll() {
@@ -86,5 +95,29 @@ public class RecipesServiceImpl implements RecipesService {
     @Override
     public void delete(Integer id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public Recipes upload(Integer id, MultipartFile file) {
+        Recipes recipe = this.getOne(id);
+
+        if (!file.getContentType().startsWith("image/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only image files are allowed.");
+        }
+
+        try {
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String newFilename = "recipe_" + id + "_photo" + extension;
+
+            Path filePath = Paths.get(uploadPath, newFilename);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            recipe.setImageUrl("/images/" + newFilename);
+
+            return repository.save(recipe);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed upload file");
+        }
     }
 }

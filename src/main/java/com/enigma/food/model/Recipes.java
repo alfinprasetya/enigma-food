@@ -20,6 +20,7 @@ public class Recipes {
     private String description;
     private String method;
     private Integer price;
+    private String imageUrl;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Ingridients> ingridients = new ArrayList<>();
