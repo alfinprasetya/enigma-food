@@ -1,6 +1,5 @@
 package com.enigma.food.controller;
 
-import com.enigma.food.model.Role;
 import com.enigma.food.model.User;
 import com.enigma.food.service.UserService;
 import com.enigma.food.utils.Res;
@@ -12,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")

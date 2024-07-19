@@ -1,4 +1,4 @@
-package com.enigma.food.utils.Specification;
+package com.enigma.food.utils.specification;
 
 import com.enigma.food.model.Items;
 import jakarta.persistence.criteria.Predicate;

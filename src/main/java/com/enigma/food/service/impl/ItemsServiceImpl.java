@@ -4,10 +4,10 @@ import com.enigma.food.model.Items;
 import com.enigma.food.repository.ItemsRepo;
 import com.enigma.food.service.ItemsService;
 import com.enigma.food.service.ValidationService;
-
-import com.enigma.food.utils.Specification.ItemsSpecification;
 import com.enigma.food.utils.dto.ItemsCreateDto;
 import com.enigma.food.utils.dto.ItemsUpdateDto;
+import com.enigma.food.utils.specification.ItemsSpecification;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.jpa.domain.Specification;

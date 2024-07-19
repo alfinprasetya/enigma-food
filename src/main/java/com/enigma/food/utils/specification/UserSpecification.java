@@ -1,6 +1,5 @@
 package com.enigma.food.utils.specification;
 
-import com.enigma.food.model.Role;
 import com.enigma.food.model.User;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
