@@ -2,7 +2,9 @@ package com.enigma.food.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,7 +28,13 @@ public class MapServiceImpl implements MapService {
         "https://api.mapbox.com/geocoding/v5/mapbox.places/%s.json?limit=1&access_token=%s",
         city, accessToken);
 
-    String response = restTemplate.getForObject(url, String.class);
+    String response = null;
+
+    try {
+      response = restTemplate.getForObject(url, String.class);
+    } catch (HttpClientErrorException e) {
+      throw new ResponseStatusException(e.getStatusCode(), e.getMessage());
+    }
 
     Coordinate realCoordinate = new Coordinate();
 
@@ -34,7 +42,7 @@ public class MapServiceImpl implements MapService {
       ObjectMapper mapper = new ObjectMapper();
       JsonNode root = mapper.readTree(response);
       JsonNode coordinates = root.path("features").get(0).path("geometry").path("coordinates");
-      
+
       double longitude = coordinates.get(0).asDouble();
       double latitude = coordinates.get(1).asDouble();
 
@@ -56,7 +64,14 @@ public class MapServiceImpl implements MapService {
         request.getDestination().getLongitude(),
         request.getDestination().getLatitude(),
         accessToken);
-    String response = restTemplate.getForObject(url, String.class);
+
+    String response = null;
+
+    try {
+      response = restTemplate.getForObject(url, String.class);
+    } catch (HttpClientErrorException e) {
+      throw new ResponseStatusException(e.getStatusCode(), e.getMessage());
+    } 
 
     Integer realDistance = 0;
 
