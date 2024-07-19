@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface RecipesService {
     Page<Recipes> getAll(String name, Integer price, Pageable pageable);
 
@@ -17,4 +19,5 @@ public interface RecipesService {
 
     void delete(Integer id);
 
+    Recipes upload(Integer id, MultipartFile file);
 }

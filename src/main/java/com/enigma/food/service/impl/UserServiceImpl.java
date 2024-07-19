@@ -5,9 +5,12 @@ import com.enigma.food.model.User;
 import com.enigma.food.repository.UserRepository;
 import com.enigma.food.service.UserService;
 import com.enigma.food.service.ValidationService;
-import com.enigma.food.utils.dto.UserDTO;
+import com.enigma.food.utils.dto.UserCreateDTO;
+import com.enigma.food.utils.dto.UserUpdateDTO;
+import com.enigma.food.utils.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final ValidationService validationService;
 
     @Override
-    public User create(UserDTO request) {
+    public User create(UserCreateDTO request) {
         validationService.validate(request);
 
         if (!userRepository.findByUsername(request.getUsername()).isEmpty()) {
@@ -33,6 +36,7 @@ public class UserServiceImpl implements UserService {
         User newAdmin = new User();
         newAdmin.setUsername(request.getUsername());
         newAdmin.setPassword(passwordEncoder.encode(request.getPassword()));
+        newAdmin.setBalance(request.getBalance());
         if (newAdmin.getRole() == null) {
             newAdmin.setRole(Role.ROLE_ADMIN);
         }
@@ -40,8 +44,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public List<User> getAll(String username, Integer minBalance, Integer maxBalance) {
+        Specification<User> specification = UserSpecification.getSpecification(username, minBalance, maxBalance);
+        return userRepository.findAll(specification);
     }
 
     @Override
@@ -52,15 +57,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(Integer id, UserDTO request) {
+    public User update(Integer id, UserUpdateDTO request) {
         validationService.validate(request);
         if (!userRepository.findByUsername(request.getUsername()).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
         User user = this.getOne(id);
-        user.setUsername(request.getUsername());
-        userRepository.save(user);
-        return user;
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
+        }
+        if (request.getPassword() != null) {
+            user.setPassword(request.getPassword());
+        }
+        if (request.getBalance() != null) {
+            user.setBalance(request.getBalance());
+        }
+        return userRepository.save(user);
+
     }
 
     @Override

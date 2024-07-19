@@ -1,16 +1,19 @@
 package com.enigma.food.controller;
 
+import com.enigma.food.model.Role;
 import com.enigma.food.model.User;
 import com.enigma.food.service.UserService;
 import com.enigma.food.utils.Res;
 
-import com.enigma.food.utils.dto.UserDTO;
-import jakarta.validation.Valid;
+import com.enigma.food.utils.dto.UserCreateDTO;
+import com.enigma.food.utils.dto.UserUpdateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -20,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody UserDTO request) {
+    public ResponseEntity<?> create(@RequestBody UserCreateDTO request) {
         return Res.renderJson(
                 userService.create(request),
                 HttpStatus.CREATED,
@@ -29,9 +32,13 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAll() {
+    public ResponseEntity<?> getAll(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) Integer minBalance,
+            @RequestParam(required = false) Integer maxBalance
+    ) {
         return Res.renderJson(
-                userService.getAll(),
+                userService.getAll(username, minBalance, maxBalance),
                 HttpStatus.OK,
                 "Succesfully get users"
         );
@@ -52,7 +59,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody UserDTO request) {
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody UserUpdateDTO request) {
         return Res.renderJson(
                 userService.update(id, request),
                 HttpStatus.OK,

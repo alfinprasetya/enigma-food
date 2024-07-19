@@ -10,6 +10,5 @@ public interface IngridientService {
     List<Ingridients> getAll();
     Ingridients getOne(Integer id);
     Ingridients create(Ingridients req);
-    Ingridients update(Integer id, Ingridients req);
     void delete(Integer id);
 }

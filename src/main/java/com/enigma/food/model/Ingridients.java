@@ -1,5 +1,6 @@
 package com.enigma.food.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class Ingridients {
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "recipe_id")
+    @JsonIgnore
     private Recipes recipe;
     @ManyToOne
     @JoinColumn(name = "item_id")
