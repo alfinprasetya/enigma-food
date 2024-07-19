@@ -1,10 +1,14 @@
 package com.enigma.food.controller;
 
 import com.enigma.food.service.OrderService;
+import com.enigma.food.utils.PageWrapper;
 import com.enigma.food.utils.Res;
 import com.enigma.food.utils.dto.CreateOrderDto;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +20,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<?> getAll(){
+    public ResponseEntity<?> getAll(@PageableDefault(page = 0, size = 10) Pageable pageable){
         return Res.renderJson(
-                orderService.getAll(),
+                new PageWrapper<>(orderService.getAll(pageable)),
                 HttpStatus.OK,
                 "Succes Get all Order"
         );

@@ -1,12 +1,15 @@
 package com.enigma.food.controller;
 
 import com.enigma.food.service.ItemsService;
+import com.enigma.food.utils.PageWrapper;
 import com.enigma.food.utils.Res;
-
 
 import com.enigma.food.utils.dto.ItemsCreateDto;
 import com.enigma.food.utils.dto.ItemsUpdateDto;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,44 +24,40 @@ public class ItemsController {
     public ResponseEntity<?> getAll(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer maxQty,
-            @RequestParam(required = false) Integer minQty
-    ){
+            @RequestParam(required = false) Integer minQty,
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
         return Res.renderJson(
-                itemsService.getAll(name, maxQty, minQty),
+                new PageWrapper<>(itemsService.getAll(name, maxQty, minQty, pageable)),
                 HttpStatus.OK,
-                "Succes Get all Items"
-        );
+                "Succes Get all Items");
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOne(@PathVariable Integer id){
+    public ResponseEntity<?> getOne(@PathVariable Integer id) {
         return Res.renderJson(
                 itemsService.getOne(id),
                 HttpStatus.OK,
-                "Succes Get Items " + id
-        );
+                "Succes Get Items " + id);
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody ItemsCreateDto req){
+    public ResponseEntity<?> create(@RequestBody ItemsCreateDto req) {
         return Res.renderJson(
                 itemsService.create(req),
                 HttpStatus.CREATED,
-                "Succes Create New Item"
-        );
+                "Succes Create New Item");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody ItemsUpdateDto req){
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody ItemsUpdateDto req) {
         return Res.renderJson(
                 itemsService.update(id, req),
                 HttpStatus.OK,
-                "Succes Update Items " + id
-        );
+                "Succes Update Items " + id);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id){
+    public void delete(@PathVariable Integer id) {
         itemsService.delete(id);
     }
 }

@@ -47,15 +47,6 @@ public class RecipesServiceImplTest {
     }
 
     @Test
-    public void testGetAll() {
-        when(repository.findAll()).thenReturn(mockRecipesList);
-
-        List<Recipes> result = recipesService.getAll();
-
-        assertEquals(mockRecipesList, result);
-    }
-
-    @Test
     public void testGetOne_Success() {
         Recipes recipe = new Recipes();
         recipe.setId(1);

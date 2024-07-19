@@ -10,12 +10,12 @@ import com.enigma.food.utils.specification.ItemsSpecification;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +24,9 @@ public class ItemsServiceImpl implements ItemsService {
     private final ValidationService validationService;
 
     @Override
-    public List<Items> getAll(String name, Integer maxQty, Integer minQty) {
+    public Page<Items> getAll(String name, Integer maxQty, Integer minQty, Pageable pageable) {
         Specification<Items> spec = ItemsSpecification.getItemsSpecification(name, maxQty, minQty );
-        return itemsRepo.findAll(spec);
+        return itemsRepo.findAll(spec, pageable);
     }
 
     @Override

@@ -18,12 +18,13 @@ import com.enigma.food.utils.dto.GetDistanceRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -37,8 +38,8 @@ public class OrderServiceImpl implements OrderService {
     private final MapService mapService;
 
     @Override
-    public List<Order> getAll() {
-        return orderRepository.findAll();
+    public Page<Order> getAll(Pageable pageable) {
+        return orderRepository.findAll(pageable);
     }
 
     @Override

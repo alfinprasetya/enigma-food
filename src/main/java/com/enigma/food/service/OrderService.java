@@ -1,12 +1,13 @@
 package com.enigma.food.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.enigma.food.model.Order;
 import com.enigma.food.utils.dto.CreateOrderDto;
 
 public interface OrderService {
-    List<Order> getAll();
+    Page<Order> getAll(Pageable pageable);
     Order getOne(Integer id);
     Order create(CreateOrderDto req);
     void delete(Integer id);

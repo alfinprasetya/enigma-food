@@ -10,6 +10,8 @@ import com.enigma.food.utils.dto.UserUpdateDTO;
 import com.enigma.food.utils.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,9 +46,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll(String username, Integer minBalance, Integer maxBalance) {
+    public Page<User> getAll(String username, Integer minBalance, Integer maxBalance,Pageable pageable) {
         Specification<User> specification = UserSpecification.getSpecification(username, minBalance, maxBalance);
-        return userRepository.findAll(specification);
+        return userRepository.findAll(specification, pageable);
     }
 
     @Override

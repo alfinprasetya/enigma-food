@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/recipes")
@@ -26,7 +24,7 @@ public class RecipesController {
     private final RecipesService service;
 
     @GetMapping
-    public ResponseEntity<?> getAll(@RequestParam(required = false)String name, @RequestParam(required = false) Integer price, @PageableDefault Pageable pageable){
+    public ResponseEntity<?> getAll(@RequestParam(required = false)String name, @RequestParam(required = false) Integer price, @PageableDefault(page = 0, size = 10) Pageable pageable){
         Page<Recipes> recipesPage = service.getAll(name, price, pageable);
         PageWrapper<Recipes> result = new PageWrapper<>(recipesPage);
         return Res.renderJson(result,HttpStatus.OK, "Recipe Found");
