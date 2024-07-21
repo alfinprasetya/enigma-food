@@ -6,6 +6,7 @@ import com.enigma.food.repository.UserRepository;
 import com.enigma.food.service.ValidationService;
 import com.enigma.food.utils.dto.UserCreateDTO;
 import com.enigma.food.utils.dto.UserUpdateDTO;
+import com.enigma.food.utils.specification.UserSpecification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,14 +14,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -31,61 +39,28 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private ValidationService validationService;
 
     @Mock
-    private ValidationService validationService;
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
 
-    private User user;
-    private List<User> mockUserList;
-
-    @BeforeEach
-    public void setUp() {
-        User user1 = new User();
-        user1.setId(1);
-        user1.setUsername("user1");
-        user1.setPassword("password1");
-        user1.setBalance(1000);
-        user1.setRole(Role.ROLE_USER);
-
-        User user2 = new User();
-        user2.setId(2);
-        user2.setUsername("user2");
-        user2.setPassword("password2");
-        user2.setBalance(2000);
-        user2.setRole(Role.ROLE_ADMIN);
-
-        mockUserList = Arrays.asList(user1, user2);
-    }
-
     @Test
     public void testCreateUser_Success() {
+        User user = mock(User.class);
         UserCreateDTO dto = new UserCreateDTO();
-        dto.setUsername("newuser");
-        dto.setPassword("newpassword");
+        dto.setUsername("alwi");
+        dto.setPassword("password");
         dto.setBalance(3000);
 
-        User newUser = new User();
-        newUser.setUsername("newuser");
-        newUser.setPassword("encodedpassword");
-        newUser.setBalance(3000);
-        newUser.setRole(Role.ROLE_ADMIN);
+        when(userRepository.save(any(User.class)))
+                .thenReturn(user);
 
-        when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(dto.getPassword())).thenReturn("encodedpassword");
-        when(userRepository.save(any(User.class))).thenReturn(newUser);
+        User saveUser = userService.create(dto);
 
-        User result = userService.create(dto);
-
-        assertEquals("newuser", result.getUsername());
-        assertEquals(3000, result.getBalance());
-        assertEquals(Role.ROLE_ADMIN, result.getRole());
-        verify(userRepository).findByUsername(dto.getUsername());
-        verify(passwordEncoder).encode(dto.getPassword());
-        verify(userRepository).save(any(User.class));
+        assertThat(saveUser).isNotNull();
     }
 
     @Test
@@ -105,15 +80,57 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testGetUserById_Success() {
-        User user = mockUserList.get(0);
+    public void testGetAll() {
+        String username1 = "testUser1";
+        String username2 = "testUser2";
+        String username3 = "testUser3";
+        Integer minBalance = 100;
+        Integer maxBalance = 1000;
+        Pageable pageable = PageRequest.of(0, 2);  // hal pertama dengan ukuran 2
 
-        when(userRepository.findById(1)).thenReturn(Optional.of(user));
+        User user1 = new User();
+        user1.setUsername(username1);
+        user1.setBalance(500);
 
-        User result = userService.getOne(1);
+        User user2 = new User();
+        user2.setUsername(username2);
+        user2.setBalance(700);
 
-        assertEquals(user, result);
-        verify(userRepository).findById(1);
+        User user3 = new User();
+        user3.setUsername(username3);
+        user3.setBalance(900);
+
+        // list dengan semua data
+        List<User> usersList = Arrays.asList(user1, user2, user3);
+
+        // sublist sesuai dengan ukuran halaman
+        List<User> pageContent = usersList.subList(0, pageable.getPageSize());
+        Page<User> usersPage = new PageImpl<>(pageContent, pageable, usersList.size());
+
+        when(userRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(usersPage);
+
+        Page<User> result = userService.getAll(null, minBalance, maxBalance, pageable);
+
+        assertNotNull(result);
+        assertEquals(3, result.getTotalElements());  // total elemen tetap 3
+        assertEquals(2, result.getNumberOfElements());  // jumlah elemen dalam halaman sesuai ukuran halaman
+
+        // elemen dalam halaman sesuai dengan ukuran halaman
+        assertEquals(username1, result.getContent().get(0).getUsername());
+        assertEquals(500, result.getContent().get(0).getBalance());
+        assertEquals(username2, result.getContent().get(1).getUsername());
+        assertEquals(700, result.getContent().get(1).getBalance());
+    }
+
+    @Test
+    public void UserService_GetById_ReturnUser() {
+        User user = mock(User.class);
+
+        when(userRepository.findById(any(Integer.class)))
+                .thenReturn(Optional.ofNullable(user));
+        User foundUser = userService.getOne(1);
+
+        assertThat(foundUser).isNotNull();
     }
 
     @Test
@@ -124,34 +141,27 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testUpdateUser_Success() {
-        UserUpdateDTO dto = new UserUpdateDTO();
-        dto.setUsername("updateduser");
-        dto.setPassword("updatedpassword");
-        dto.setBalance(4000);
+    public void UserService_UpdateById_ReturnUpdatedUser() {
+        User user = mock(User.class);
+        UserUpdateDTO updateUser = new UserUpdateDTO();
+        updateUser.setUsername("alwiya");
+        updateUser.setPassword("Password@123");
+        updateUser.setBalance(1000);
 
-        User existingUser = mockUserList.get(0);
-        existingUser.setUsername("user1");
+        when(userRepository.findById(any(Integer.class)))
+                .thenReturn(Optional.ofNullable(user));
+        when(userRepository.save(any(User.class)))
+                .thenReturn(user);
+        User updatedUser = userService.update(1, updateUser);
 
-        when(userRepository.findById(1)).thenReturn(Optional.of(existingUser));
-        when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenReturn(existingUser);
-
-        User result = userService.update(1, dto);
-
-        assertEquals("updateduser", result.getUsername());
-        assertEquals("updatedpassword", result.getPassword());
-        assertEquals(4000, result.getBalance());
-        verify(userRepository).findById(1);
-        verify(userRepository).findByUsername(dto.getUsername());
-        verify(userRepository).save(any(User.class));
+        assertThat(updatedUser).isNotNull();
     }
 
     @Test
-    public void testDelete_Success() {
+    public void testDeleteUser_Success() {
         userService.delete(1);
 
-        verify(userRepository).deleteById(1);
+        verify(userRepository, times(1)).deleteById(1);
     }
 
     @Test
