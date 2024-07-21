@@ -7,6 +7,7 @@ import com.enigma.food.model.OrderDetail;
 import com.enigma.food.model.Recipes;
 import com.enigma.food.model.User;
 import com.enigma.food.repository.OrderRepository;
+import com.enigma.food.service.AuthService;
 import com.enigma.food.service.ItemsService;
 import com.enigma.food.service.MapService;
 import com.enigma.food.service.OrderDetailService;
@@ -38,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     private final ValidationService validationService;
     private final OrderDetailService orderDetailService;
     private final UserService userService;
+    private final AuthService authService;
     private final RecipesService recipesService;
     private final MapService mapService;
     private final ItemsService itemsService;
@@ -58,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
     public Order create(CreateOrderDto req) {
         validationService.validate(req);
 
-        User user = userService.getOne(req.getUserId());
+        User user = authService.getAuthenticatedUser();
 
         Coordinate officeCoordinate = mapService.getCityCoordinate("jakarta");
         Integer priceByDistance = mapService

@@ -24,6 +24,7 @@ public class User {
     private Integer id;
 
     private String username;
+    @JsonIgnore
     private String password;
     private Integer balance;
 
