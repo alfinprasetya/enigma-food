@@ -1,5 +1,7 @@
 package com.enigma.food.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +21,7 @@ import com.enigma.food.service.ValidationService;
 import com.enigma.food.utils.dto.UserCreateDTO;
 import com.enigma.food.utils.dto.UserLoginDTO;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -74,5 +77,24 @@ public class AuthServiceImpl implements AuthService {
       }
     }
     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not Found");
+  }
+
+  @PostConstruct
+  public void initAdmin() {
+    String username = "admin";
+    String password = "Admin123=";
+
+    Optional<User> optionalUserCredential = userRepository.findByUsername(username);
+    if (optionalUserCredential.isPresent()) {
+      return;
+    }
+
+    Role roleAdmin = Role.ROLE_ADMIN;
+    User userCredential = User.builder()
+        .username(username)
+        .password(passwordEncoder.encode(password))
+        .role(roleAdmin)
+        .build();
+    userRepository.save(userCredential);
   }
 }
