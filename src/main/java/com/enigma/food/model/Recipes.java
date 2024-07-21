@@ -9,11 +9,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Data
 @Table(name = "recipes")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Recipes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
