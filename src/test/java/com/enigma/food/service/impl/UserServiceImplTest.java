@@ -1,14 +1,12 @@
 package com.enigma.food.service.impl;
 
-import com.enigma.food.model.Role;
 import com.enigma.food.model.User;
 import com.enigma.food.repository.UserRepository;
+import com.enigma.food.service.AuthService;
 import com.enigma.food.service.ValidationService;
+import com.enigma.food.utils.dto.TopUpDto;
 import com.enigma.food.utils.dto.UserCreateDTO;
 import com.enigma.food.utils.dto.UserUpdateDTO;
-import com.enigma.food.utils.specification.UserSpecification;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,12 +22,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +45,9 @@ public class UserServiceImplTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    @Mock
+    private AuthService authService;
 
     @Test
     public void testCreateUser_Success() {
@@ -86,7 +88,7 @@ public class UserServiceImplTest {
         String username3 = "testUser3";
         Integer minBalance = 100;
         Integer maxBalance = 1000;
-        Pageable pageable = PageRequest.of(0, 2);  // hal pertama dengan ukuran 2
+        Pageable pageable = PageRequest.of(0, 2); // hal pertama dengan ukuran 2
 
         User user1 = new User();
         user1.setUsername(username1);
@@ -112,8 +114,8 @@ public class UserServiceImplTest {
         Page<User> result = userService.getAll(null, minBalance, maxBalance, pageable);
 
         assertNotNull(result);
-        assertEquals(3, result.getTotalElements());  // total elemen tetap 3
-        assertEquals(2, result.getNumberOfElements());  // jumlah elemen dalam halaman sesuai ukuran halaman
+        assertEquals(3, result.getTotalElements()); // total elemen tetap 3
+        assertEquals(2, result.getNumberOfElements()); // jumlah elemen dalam halaman sesuai ukuran halaman
 
         // elemen dalam halaman sesuai dengan ukuran halaman
         assertEquals(username1, result.getContent().get(0).getUsername());
@@ -170,6 +172,38 @@ public class UserServiceImplTest {
 
         assertThrows(ResponseStatusException.class, () -> userService.delete(1));
         verify(userRepository).deleteById(1);
+    }
+
+    @Test
+    public void testTopUp_Success() {
+        TopUpDto topUpDto = new TopUpDto();
+        topUpDto.setBalance(500);
+        User authenticatedUser = new User();
+        authenticatedUser.setBalance(1000);
+
+        when(authService.getAuthenticatedUser()).thenReturn(authenticatedUser);
+        when(userRepository.save(any(User.class))).thenReturn(authenticatedUser);
+
+        User updatedUser = userService.topUp(topUpDto);
+
+        assertNotNull(updatedUser);
+        assertEquals(1500, updatedUser.getBalance());
+        verify(authService, times(1)).getAuthenticatedUser();
+        verify(userRepository, times(1)).save(authenticatedUser);
+        verify(validationService, times(1)).validate(topUpDto);
+    }
+
+    @Test
+    public void testTopUp_InvalidRequest() {
+        TopUpDto topUpDto = new TopUpDto();
+        topUpDto.setBalance(500);
+
+        doThrow(new IllegalArgumentException("Invalid request")).when(validationService).validate(topUpDto);
+
+        assertThrows(IllegalArgumentException.class, () -> userService.topUp(topUpDto));
+        verify(validationService, times(1)).validate(topUpDto);
+        verify(authService, never()).getAuthenticatedUser();
+        verify(userRepository, never()).save(any(User.class));
     }
 
 }
