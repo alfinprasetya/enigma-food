@@ -84,11 +84,13 @@ public class RecipesServiceImplTest {
         recipeCreatesDTO.setMethod("Goreng Ayam");
         recipeCreatesDTO.setDescription("Ayam, Minyak");
         recipeCreatesDTO.setIngredients(Collections.singletonList(item));
+
         Recipes expectedRecipes = new Recipes();
         expectedRecipes.setName(recipeCreatesDTO.getName());
         expectedRecipes.setPrice(recipeCreatesDTO.getPrice());
         expectedRecipes.setName(recipeCreatesDTO.getMethod());
         expectedRecipes.setDescription(recipeCreatesDTO.getDescription());
+        expectedRecipes.setIngridients(recipeCreatesDTO.getIngredients(List<item>));
         when(repository.save(any())).thenReturn(expectedRecipes);
 
         Recipes result = recipesService.create(recipeCreatesDTO);
