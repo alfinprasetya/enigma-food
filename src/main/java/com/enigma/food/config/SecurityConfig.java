@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/recipes/**", "GET")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/orders/**", "POST")).hasAnyRole("USER", "ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/users/topup", "POST")).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/images/**", "GET")).permitAll()
                         .anyRequest().hasRole("ADMIN"))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

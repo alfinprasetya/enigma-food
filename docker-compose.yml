@@ -8,3 +8,21 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     volumes:
       - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - app_network
+  app:
+    container_name: langsungmasak
+    image: langsungmasak:1.0
+    depends_on:
+      - mysql
+    ports:
+      - 8080:8080
+    environment:
+      - jwt_secret=be57f43bb631c07d9d7176f50f713802cb7bfabf81af183876233969c5f388f8
+    volumes:
+      - ./upload:/upload
+    networks:
+      - app_network
+networks:
+  app_network:
+    name: app_network
