@@ -4,7 +4,7 @@ import com.enigma.food.model.User;
 import com.enigma.food.service.UserService;
 import com.enigma.food.utils.PageWrapper;
 import com.enigma.food.utils.Res;
-
+import com.enigma.food.utils.dto.TopUpDto;
 import com.enigma.food.utils.dto.UserCreateDTO;
 import com.enigma.food.utils.dto.UserUpdateDTO;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/users")
@@ -68,4 +70,13 @@ public class UserController {
     public void delete(@PathVariable Integer id) {
         userService.delete(id);
     }
+
+    @PostMapping("/topup")
+    public ResponseEntity<?> TopUp(@RequestBody TopUpDto req) {
+        return Res.renderJson(
+                userService.topUp(req),
+                HttpStatus.OK,
+                "Top up success");
+    }
+
 }

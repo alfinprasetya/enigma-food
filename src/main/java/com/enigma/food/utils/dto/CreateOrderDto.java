@@ -20,10 +20,6 @@ import lombok.Setter;
 @Valid
 public class CreateOrderDto {
 
-  @NotNull
-  @Positive
-  private Integer userId;
-
   @Valid
   private Coordinate destination;
 

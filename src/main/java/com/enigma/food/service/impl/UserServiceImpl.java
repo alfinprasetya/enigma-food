@@ -3,8 +3,10 @@ package com.enigma.food.service.impl;
 import com.enigma.food.model.Role;
 import com.enigma.food.model.User;
 import com.enigma.food.repository.UserRepository;
+import com.enigma.food.service.AuthService;
 import com.enigma.food.service.UserService;
 import com.enigma.food.service.ValidationService;
+import com.enigma.food.utils.dto.TopUpDto;
 import com.enigma.food.utils.dto.UserCreateDTO;
 import com.enigma.food.utils.dto.UserUpdateDTO;
 import com.enigma.food.utils.specification.UserSpecification;
@@ -18,8 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -27,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ValidationService validationService;
+    private final AuthService authService;
 
     @Override
     public User create(UserCreateDTO request) {
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> getAll(String username, Integer minBalance, Integer maxBalance,Pageable pageable) {
+    public Page<User> getAll(String username, Integer minBalance, Integer maxBalance, Pageable pageable) {
         Specification<User> specification = UserSpecification.getSpecification(username, minBalance, maxBalance);
         return userRepository.findAll(specification, pageable);
     }
@@ -81,5 +82,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Integer id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User topUp(TopUpDto req) {
+        validationService.validate(req);
+        User authenticatedUser = authService.getAuthenticatedUser();
+        authenticatedUser.setBalance(authenticatedUser.getBalance() + req.getBalance());
+        return userRepository.save(authenticatedUser);
     }
 }
