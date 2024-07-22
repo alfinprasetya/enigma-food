@@ -17,9 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,28 +77,28 @@ public class RecipesServiceImplTest {
     }
     @Test
     public void createSuccess() {
-        Items items = new Items();
-        items.setId(1);
-        items.setQty(10);
-        Ingridients ing = new Ingridients();
-        ing.setItem(items);
-        ing.setQty(1);
-
-        RecipeCreatesDTO dto = new RecipeCreatesDTO("Recipe 1",
-                "Ayam, Minyak","Gorenglah Ayam",10000,);
-
+        RecipeCreatesDTO.Item item  = new RecipeCreatesDTO.Item(1, 1);
+        RecipeCreatesDTO recipeCreatesDTO = new RecipeCreatesDTO();
+        recipeCreatesDTO.setName("Recipe1");
+        recipeCreatesDTO.setPrice(5000);
+        recipeCreatesDTO.setMethod("Goreng Ayam");
+        recipeCreatesDTO.setDescription("Ayam, Minyak");
+        recipeCreatesDTO.setIngredients(Collections.singletonList(item));
         Recipes expectedRecipes = new Recipes();
-        expectedRecipes.setName(dto.getName());
-        expectedRecipes.setPrice(dto.getPrice());
-
+        expectedRecipes.setName(recipeCreatesDTO.getName());
+        expectedRecipes.setPrice(recipeCreatesDTO.getPrice());
+        expectedRecipes.setName(recipeCreatesDTO.getMethod());
+        expectedRecipes.setDescription(recipeCreatesDTO.getDescription());
         when(repository.save(any())).thenReturn(expectedRecipes);
 
-        Recipes result = recipesService.create(dto);
+        Recipes result = recipesService.create(recipeCreatesDTO);
 
         assertNotNull(result);
         assertEquals("Recipe 1", result.getName());
-        assertEquals(10000, result.getPrice());
-        verify(validationService, times(1)).validate(dto);
+        assertEquals(5000, result.getPrice());
+        assertEquals("Goreng Ayam", result.getMethod());
+        assertEquals("Ayam, Minyak", result.getDescription());
+        verify(validationService, times(1)).validate(recipeCreatesDTO);
         verify(repository, times(1)).save(any(Recipes.class));
     }
 }
