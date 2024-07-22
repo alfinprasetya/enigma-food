@@ -7,7 +7,9 @@ import com.enigma.food.repository.IngridientsRepository;
 import com.enigma.food.repository.RecipesRepository;
 import com.enigma.food.service.ValidationService;
 import com.enigma.food.utils.dto.ItemsCreateDto;
+import com.enigma.food.utils.dto.ItemsUpdateDto;
 import com.enigma.food.utils.dto.RecipeCreatesDTO;
+import com.enigma.food.utils.dto.RecipeUpdatesDTO;
 import jakarta.validation.Valid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,7 +92,6 @@ public class RecipesServiceImplTest {
         expectedRecipes.setPrice(recipeCreatesDTO.getPrice());
         expectedRecipes.setName(recipeCreatesDTO.getMethod());
         expectedRecipes.setDescription(recipeCreatesDTO.getDescription());
-        expectedRecipes.setIngridients(recipeCreatesDTO.getIngredients(List<item>));
         when(repository.save(any())).thenReturn(expectedRecipes);
 
         Recipes result = recipesService.create(recipeCreatesDTO);
@@ -102,5 +103,40 @@ public class RecipesServiceImplTest {
         assertEquals("Ayam, Minyak", result.getDescription());
         verify(validationService, times(1)).validate(recipeCreatesDTO);
         verify(repository, times(1)).save(any(Recipes.class));
+    }
+    @Test
+    public void updateSuccess(){
+        Recipes recipes = new Recipes();
+        RecipeUpdatesDTO dto = new RecipeUpdatesDTO("Recipe 1", "Ayam, Minyak", "Goreng Ayam",5000);
+        when(repository.findById(1)).thenReturn(Optional.of(recipes));
+        when(repository.save(any(Recipes.class))).thenReturn(recipes);
+
+        Recipes result = recipesService.update(1, dto);
+
+        assertNotNull(result);
+        assertEquals("Recipe 1", result.getName());
+        assertEquals("Ayam, Minyak",result.getDescription());
+        assertEquals("Goreng Ayam", result.getMethod());
+        assertEquals(5000, result.getPrice());
+        verify(validationService, times(1)).validate(dto);
+        verify(repository, times(1)).findById(1);
+        verify(repository, times(1)).save(any(Recipes.class));
+    }
+
+    @Test
+    public void updateNotFound(){
+        RecipeUpdatesDTO dto = new RecipeUpdatesDTO("Recipe 1", "Ayam, Minyak","Goreng Ayam", 5000);
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> recipesService.update(1, dto));
+        verify(repository, times(1)).findById(1);
+        verify(repository, times(0)).save(any(Recipes.class));
+
+    }
+    @Test
+    public void deleteSuccess(){
+        recipesService.delete(2);
+
+        verify(repository, times(1)).deleteById(2);
     }
 }
