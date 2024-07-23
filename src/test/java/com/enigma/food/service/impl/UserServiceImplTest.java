@@ -176,26 +176,38 @@ public class UserServiceImplTest {
 
     @Test
     public void testTopUp_Success() {
+        User user = new User();
+        user.setId(1);
+        user.setUsername("user1");
+        user.setPassword("Password1@");
+        user.setBalance(1000);
         TopUpDto topUpDto = new TopUpDto();
+        topUpDto.setUserId(user.getId());
         topUpDto.setBalance(500);
-        User authenticatedUser = new User();
-        authenticatedUser.setBalance(1000);
 
-        when(authService.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(userRepository.save(any(User.class))).thenReturn(authenticatedUser);
+        when(authService.getAuthenticatedUser()).thenReturn(user);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         User updatedUser = userService.topUp(topUpDto);
 
         assertNotNull(updatedUser);
         assertEquals(1500, updatedUser.getBalance());
         verify(authService, times(1)).getAuthenticatedUser();
-        verify(userRepository, times(1)).save(authenticatedUser);
+        verify(userRepository, times(1)).findById(user.getId());
+        verify(userRepository, times(1)).save(user);
         verify(validationService, times(1)).validate(topUpDto);
     }
 
     @Test
     public void testTopUp_InvalidRequest() {
+        User user = new User();
+        user.setId(1);
+        user.setUsername("user1");
+        user.setPassword("Password1@");
+        user.setBalance(1000);
         TopUpDto topUpDto = new TopUpDto();
+        topUpDto.setUserId(user.getId());
         topUpDto.setBalance(500);
 
         doThrow(new IllegalArgumentException("Invalid request")).when(validationService).validate(topUpDto);
@@ -203,6 +215,27 @@ public class UserServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> userService.topUp(topUpDto));
         verify(validationService, times(1)).validate(topUpDto);
         verify(authService, never()).getAuthenticatedUser();
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    public void testTopUp_UserNotFound() {
+        User user = new User();
+        user.setId(1);
+        user.setUsername("user1");
+        user.setPassword("Password1@");
+        user.setBalance(1000);
+        TopUpDto topUpDto = new TopUpDto();
+        topUpDto.setUserId(user.getId());
+        topUpDto.setBalance(500);
+
+        when(authService.getAuthenticatedUser()).thenReturn(user);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.topUp(topUpDto));
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(authService, times(1)).getAuthenticatedUser();
+        verify(userRepository, times(1)).findById(user.getId());
         verify(userRepository, never()).save(any(User.class));
     }
 

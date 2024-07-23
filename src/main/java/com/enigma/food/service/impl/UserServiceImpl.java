@@ -87,8 +87,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User topUp(TopUpDto req) {
         validationService.validate(req);
-        User authenticatedUser = authService.getAuthenticatedUser();
-        authenticatedUser.setBalance(authenticatedUser.getBalance() + req.getBalance());
-        return userRepository.save(authenticatedUser);
+        authService.getAuthenticatedUser();
+        User user = this.getOne(req.getUserId());
+        user.setBalance(user.getBalance() + req.getBalance());
+        return userRepository.save(user);
     }
 }

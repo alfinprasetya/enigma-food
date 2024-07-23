@@ -32,9 +32,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/recipes/**", "GET")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/orders/**", "POST")).hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/users/topup", "POST")).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/orders/**", "POST")).hasAnyRole("USER")
+                        .requestMatchers(new AntPathRequestMatcher("/users/topup", "POST")).hasRole( "ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/images/**", "GET")).permitAll()
+                        .requestMatchers("/map/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().hasRole("ADMIN"))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

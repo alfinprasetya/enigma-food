@@ -12,5 +12,9 @@ import lombok.NoArgsConstructor;
 public class TopUpDto {
   @NotNull
   @Positive
+  private Integer userId;
+
+  @NotNull
+  @Positive
   private Integer balance;
 }
