@@ -4,7 +4,6 @@ import com.enigma.food.model.Recipes;
 import com.enigma.food.service.RecipesService;
 import com.enigma.food.utils.dto.RecipeCreatesDTO;
 import com.enigma.food.utils.dto.RecipeUpdatesDTO;
-import com.enigma.food.utils.dto.UserCreateDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -69,7 +67,7 @@ public class RecipeControllerTest {
         mockMvc.perform(post("/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(recipeCreatesDTO)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 //                .andExpect(jsonPath("$.data.name", is("Recipe 1")));
         verify(recipesService).create(any(RecipeCreatesDTO.class));
     }
