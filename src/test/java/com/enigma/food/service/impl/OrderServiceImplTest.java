@@ -139,7 +139,6 @@ public class OrderServiceImplTest {
         orderDetail.setQty(2);
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(mapService.getCityCoordinate("jakarta")).thenReturn(destination);
         when(mapService.getPriceByDistance(any(GetDistanceRequest.class))).thenReturn(2000);
         when(recipesService.getOne(1)).thenReturn(recipe);
         when(orderRepository.save(any(Order.class))).thenReturn(order);
@@ -203,7 +202,6 @@ public class OrderServiceImplTest {
         orderDetail.setQty(2);
 
         when(authService.getAuthenticatedUser()).thenReturn(user);
-        when(mapService.getCityCoordinate("jakarta")).thenReturn(destination);
         when(mapService.getPriceByDistance(any(GetDistanceRequest.class))).thenReturn(2000);
         when(recipesService.getOne(1)).thenReturn(recipe);
 

@@ -62,9 +62,8 @@ public class OrderServiceImpl implements OrderService {
 
         User user = authService.getAuthenticatedUser();
 
-        Coordinate officeCoordinate = mapService.getCityCoordinate("jakarta");
         Integer priceByDistance = mapService
-                .getPriceByDistance(new GetDistanceRequest(officeCoordinate, req.getDestination()));
+                .getPriceByDistance(new GetDistanceRequest(req.getDestination()));
 
         AtomicInteger totalPrice = new AtomicInteger(priceByDistance);
         

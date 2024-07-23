@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class GetDistanceRequest {
-  private Coordinate origin;
   private Coordinate destination;
 }

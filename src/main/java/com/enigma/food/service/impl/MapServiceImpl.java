@@ -1,5 +1,7 @@
 package com.enigma.food.service.impl;
 
+import com.enigma.food.service.ValidationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -15,8 +17,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+@RequiredArgsConstructor
 public class MapServiceImpl implements MapService {
 
+  private final ValidationService validationService;
   private static final RestTemplate restTemplate = new RestTemplate();
 
   @Value("${app.mapboxToken}")
@@ -57,10 +61,12 @@ public class MapServiceImpl implements MapService {
 
   @Override
   public Integer getDistance(GetDistanceRequest request) {
+    validationService.validate(request);
+    Coordinate officeCoordinate = this.getCityCoordinate("jakarta");
     String url = String.format(
         "https://api.mapbox.com/directions/v5/mapbox/driving/%f,%f;%f,%f?access_token=%s",
-        request.getOrigin().getLongitude(),
-        request.getOrigin().getLatitude(),
+        officeCoordinate.getLongitude(),
+        officeCoordinate.getLatitude(),
         request.getDestination().getLongitude(),
         request.getDestination().getLatitude(),
         accessToken);
